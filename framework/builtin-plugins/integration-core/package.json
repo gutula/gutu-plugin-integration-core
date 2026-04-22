@@ -1,0 +1,42 @@
+{
+  "name": "@plugins/integration-core",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "bunx tsc -p tsconfig.build.json",
+    "typecheck": "bunx tsc -p tsconfig.json --noEmit",
+    "lint": "bunx eslint .",
+    "test": "bun test",
+    "test:integration": "bun test tests/integration",
+    "test:migrations": "bun test tests/migrations",
+    "test:unit": "bun test tests/unit",
+    "test:contracts": "bun test tests/contracts"
+  },
+  "dependencies": {
+    "@platform/admin-builders": "workspace:*",
+    "@platform/admin-contracts": "workspace:*",
+    "@platform/ai-mcp": "workspace:*",
+    "@platform/ai-runtime": "workspace:*",
+    "@platform/kernel": "workspace:*",
+    "@platform/permissions": "workspace:*",
+    "@platform/schema": "workspace:*",
+    "@platform/ui": "workspace:*",
+    "@platform/ui-shell": "workspace:*",
+    "@plugins/auth-core": "workspace:*",
+    "@plugins/audit-core": "workspace:*",
+    "@plugins/org-tenant-core": "workspace:*",
+    "@plugins/role-policy-core": "workspace:*",
+    "drizzle-orm": "^0.45.2",
+    "react": "^19.1.0",
+    "zod": "^4.0.0"
+  }
+}
