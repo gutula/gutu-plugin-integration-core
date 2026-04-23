@@ -54,6 +54,11 @@ Provides the governed connector and webhook foundation used by higher-level runt
 | Field | Value |
 | --- | --- |
 | Depends On | `auth-core`, `org-tenant-core`, `role-policy-core`, `audit-core` |
+| Recommended Plugins | None |
+| Capability Enhancing | None |
+| Integration Only | None |
+| Suggested Packs | None |
+| Standalone Supported | Yes |
 | Requested Capabilities | `ui.register.admin`, `api.rest.mount`, `data.write.integrations` |
 | Provides Capabilities | `integrations.connectors`, `integrations.connections`, `integrations.webhooks` |
 | Owns Data | `integrations.connectors`, `integrations.connections`, `integrations.webhooks` |
