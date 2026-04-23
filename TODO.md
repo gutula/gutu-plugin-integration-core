@@ -4,25 +4,24 @@
 
 ## Shipped Now
 
-- Added durable connector, connection, and webhook resources.
-- Added connector registration, authorization, and webhook-secret rotation actions.
-- Added the `integrations` workspace and `integration-builder`.
-- Added integration and migration tests for connector lifecycle and health visibility.
+- Exports 3 governed actions: `integrations.connectors.register`, `integrations.connections.authorize`, `integrations.webhooks.rotate-secret`.
+- Owns 3 resource contracts: `integrations.connectors`, `integrations.connections`, `integrations.webhooks`.
+- Adds richer admin workspace contributions on top of the base UI surface.
+- Defines a durable data schema contract even though no explicit SQL helper module is exported.
 
 ## Current Gaps
 
-- Secret storage is still local-governed state rather than a real vault adapter.
-- Connector quarantine and disable flows are not first-class yet.
-- Webhook delivery tracing can go deeper.
+- No standalone plugin-owned event, job, or workflow catalog is exported yet; compose it through actions, resources, and the surrounding Gutu runtime.
+- The repo does not yet export a domain parity catalog with owned entities, reports, settings surfaces, and exception queues.
 
 ## Recommended Next
 
-- Add vault-backed secret providers and envelope encryption contracts.
-- Add connector quarantine, disable, and recovery workflows.
-- Add webhook replay inspection and signature-verification diagnostics.
-- Extend the MCP bridge with richer per-tool approval and host policy.
+- Broaden connector depth only where the current webhook, secret, and governance contracts have already stabilized.
+- Add stronger operator diagnostics for connector health, credential drift, and replay scenarios as usage expands.
+- Add deeper provider, persistence, or evaluation integrations only where the shipped control-plane contracts already prove stable.
+- Expand operator diagnostics and release gating where the current lifecycle already exposes strong evidence paths.
+- Promote important downstream reactions into explicit commands, jobs, or workflow steps instead of relying on implicit coupling.
 
 ## Later / Optional
 
-- Marketplace-style connector templates once signed package delivery stabilizes.
-- Remote connector agents when out-of-process runtime delegation lands.
+- More connector breadth, richer evaluation libraries, and domain-specific copilots after the baseline contracts settle.

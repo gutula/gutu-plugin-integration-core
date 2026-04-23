@@ -5,6 +5,12 @@ export default definePackage({
   kind: "plugin",
   version: "0.1.0",
   displayName: "Integration Core",
+  defaultCategory: {
+    id: "integrations",
+    label: "Integrations",
+    subcategoryId: "connectors_webhooks",
+    subcategoryLabel: "Connectors & Webhooks"
+  },
   description: "Governed connector definitions, connection authorization, webhook ingress, and MCP-aware integration health.",
   extends: [],
   dependsOn: [

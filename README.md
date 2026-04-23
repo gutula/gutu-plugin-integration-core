@@ -4,11 +4,9 @@
   <img src="./docs/assets/gutu-mascot.png" alt="Gutu mascot" width="220" />
 </p>
 
-Governed connector definitions, connection authorization, webhook ingress, and MCP-aware integration health for the Gutu control plane.
+Governed connector definitions, connection authorization, webhook ingress, and MCP-aware integration health.
 
-![Maturity: Hardened](https://img.shields.io/badge/Maturity-Hardened-0f766e) ![Verification: Docs+Build+Typecheck+Lint+Test+Contracts+Integration+Migrations](https://img.shields.io/badge/Verification-Docs%2BBuild%2BTypecheck%2BLint%2BTest%2BContracts%2BIntegration%2BMigrations-6b7280) ![DB: postgres+sqlite](https://img.shields.io/badge/DB-postgres%2Bsqlite-2563eb) ![Integration Model: Actions+Resources+Builders+UI](https://img.shields.io/badge/Integration%20Model-Actions%2BResources%2BBuilders%2BUI-6b7280)
-
-**Maturity Tier:** `Hardened`
+![Maturity: Hardened](https://img.shields.io/badge/Maturity-Hardened-2563eb) ![Verification: Build+Typecheck+Lint+Test+Contracts+Migrations+Integration](https://img.shields.io/badge/Verification-Build%2BTypecheck%2BLint%2BTest%2BContracts%2BMigrations%2BIntegration-2563eb) ![DB: postgres+sqlite](https://img.shields.io/badge/DB-postgres%2Bsqlite-2563eb) ![Integration Model: Actions+Resources+UI](https://img.shields.io/badge/Integration%20Model-Actions%2BResources%2BUI-6b7280)
 
 ## Part Of The Gutu Stack
 
@@ -16,31 +14,36 @@ Governed connector definitions, connection authorization, webhook ingress, and M
 | --- | --- |
 | Repo kind | First-party plugin |
 | Domain group | AI Systems |
-| Primary focus | connectors, authorizations, webhook ingress, integration health |
-| Best when | You want MCP/app style integration flexibility with explicit policy, secrets, and audit boundaries. |
-| Composes through | Actions+Resources+Builders+UI |
+| Default category | Integrations / Connectors & Webhooks |
+| Primary focus | connectors, webhooks, external-system governance |
+| Best when | You need a governed domain boundary with explicit contracts and independent release cadence. |
+| Composes through | Actions+Resources+UI |
 
-- `integration-core` is the governed connector plane that lets the AI stack talk to external systems without turning connectors into hidden runtime side effects.
-- It complements `@platform/ai-mcp` by owning connector records and operator-facing lifecycle state.
+- Gutu keeps plugins as independent repos with manifest-governed boundaries, compatibility channels, and verification lanes instead of hiding everything behind one giant mutable codebase.
+- This plugin is meant to compose through explicit actions, resources, jobs, workflows, and runtime envelopes, not through undocumented hook chains.
 
 ## What It Does Now
 
+Provides the governed connector and webhook foundation used by higher-level runtimes to interact with external systems safely.
+
 - Exports 3 governed actions: `integrations.connectors.register`, `integrations.connections.authorize`, `integrations.webhooks.rotate-secret`.
-- Owns 3 public resources: `integrations.connectors`, `integrations.connections`, `integrations.webhooks`.
-- Adds an `integrations` workspace and an `integration-builder` in the admin `tools` workspace.
-- Persists connector transport, auth posture, health, and webhook-secret lifecycle state.
-- Provides the connector control surface consumed by Company Builder, RAG pipelines, and future app/runtime flows.
+- Owns 3 resource contracts: `integrations.connectors`, `integrations.connections`, `integrations.webhooks`.
+- Adds richer admin workspace contributions on top of the base UI surface.
+- Defines a durable data schema contract even though no explicit SQL helper module is exported.
 
 ## Maturity
 
-`integration-core` is `Hardened` because the connector surface is now typed, policy-aware, migration-covered, and visible in operator UI rather than remaining an implicit runtime descriptor layer.
+**Maturity Tier:** `Hardened`
+
+This tier is justified because unit coverage exists, contract coverage exists, integration coverage exists, and migration coverage exists.
 
 ## Verified Capability Summary
 
-- Group: **AI Systems**
-- Verification surface: **Docs+Build+Typecheck+Lint+Test+Contracts+Integration+Migrations**
-- Tests discovered: **6** files across unit, contract, integration, and migration lanes
-- Integration model: **Actions+Resources+Builders+UI**
+- Domain group: **AI Systems**
+- Default category: **Integrations / Connectors & Webhooks**
+- Verification surface: **Build+Typecheck+Lint+Test+Contracts+Migrations+Integration**
+- Tests discovered: **6** total files across unit, contract, integration, migration lanes
+- Integration model: **Actions+Resources+UI**
 - Database support: **postgres + sqlite**
 
 ## Dependency And Compatibility Summary
@@ -49,13 +52,13 @@ Governed connector definitions, connection authorization, webhook ingress, and M
 | --- | --- |
 | Package | `@plugins/integration-core` |
 | Manifest ID | `integration-core` |
-| Repo | `gutu-plugin-integration-core` |
+| Repo | [gutu-plugin-integration-core](https://github.com/gutula/gutu-plugin-integration-core) |
 | Depends On | `auth-core`, `org-tenant-core`, `role-policy-core`, `audit-core` |
 | Requested Capabilities | `ui.register.admin`, `api.rest.mount`, `data.write.integrations` |
 | Provided Capabilities | `integrations.connectors`, `integrations.connections`, `integrations.webhooks` |
 | Runtime | bun>=1.3.12 |
 | Database | postgres, sqlite |
-| Integration Model | Actions+Resources+Builders+UI |
+| Integration Model | Actions+Resources+UI |
 
 ## Capability Matrix
 
@@ -63,15 +66,22 @@ Governed connector definitions, connection authorization, webhook ingress, and M
 | --- | --- | --- |
 | Actions | 3 | `integrations.connectors.register`, `integrations.connections.authorize`, `integrations.webhooks.rotate-secret` |
 | Resources | 3 | `integrations.connectors`, `integrations.connections`, `integrations.webhooks` |
-| Builders | 1 | `integration-builder` |
-| Workspaces | 1 | `integrations` |
-| UI | Present | connector overview, builder, admin commands |
+| Jobs | 0 | No job catalog exported |
+| Workflows | 0 | No workflow catalog exported |
+| UI | Present | base UI surface, admin contributions |
+| Owned Entities | 0 | No explicit domain catalog yet |
+| Reports | 0 | No explicit report catalog yet |
+| Exception Queues | 0 | No explicit exception queues yet |
+| Operational Scenarios | 0 | No explicit operational scenario matrix yet |
+| Settings Surfaces | 0 | No explicit settings surface catalog yet |
+| ERPNext Refs | 0 | No direct ERPNext reference mapping declared |
 
 ## Quick Start For Integrators
 
-Use this repo inside a compatible Gutu workspace so its `workspace:*` dependencies resolve truthfully.
+Use this repo inside a **compatible Gutu workspace** or the **ecosystem certification workspace** so its `workspace:*` dependencies resolve honestly.
 
 ```bash
+# from a compatible workspace that already includes this plugin's dependency graph
 bun install
 bun run build
 bun run test
@@ -79,19 +89,14 @@ bun run docs:check
 ```
 
 ```ts
-import {
-  manifest,
-  registerConnectorAction,
-  authorizeConnectionAction,
-  ConnectorResource,
-  WebhookResource
-} from "@plugins/integration-core";
+import { manifest, registerConnectorAction, ConnectorResource, adminContributions, uiSurface } from "@plugins/integration-core";
 
 console.log(manifest.id);
 console.log(registerConnectorAction.id);
-console.log(authorizeConnectionAction.id);
-console.log(ConnectorResource.id, WebhookResource.id);
+console.log(ConnectorResource.id);
 ```
+
+Use the root repo scripts for day-to-day work **after the workspace is bootstrapped**, or run the nested package directly from `framework/builtin-plugins/integration-core` if you need lower-level control.
 
 ## Current Test Coverage
 
@@ -103,17 +108,25 @@ console.log(ConnectorResource.id, WebhookResource.id);
 
 ## Known Boundaries And Non-Goals
 
-- This plugin owns connector and connection control state, not the full network transport client implementation.
-- Secret storage is still modeled inside the local governed state surface, not an external vault adapter.
-- Browser/code execution environments remain in `execution-workspaces-core`.
+- Not an everything-and-the-kitchen-sink provider abstraction layer.
+- Not a substitute for explicit approval, budgeting, and audit governance in the surrounding platform.
+- Cross-plugin composition should use Gutu command, event, job, and workflow primitives. This repo should not be documented as exposing a generic WordPress-style hook system unless one is explicitly exported.
 
 ## Recommended Next Milestones
 
-- Add dedicated secret-vault adapters and envelope encryption contracts.
-- Expand connector rollout, disable, and quarantine flows.
-- Add webhook delivery logs and signature replay debugging.
-- Extend the MCP runtime bridge with richer per-tool approval policy.
+- Broaden connector depth only where the current webhook, secret, and governance contracts have already stabilized.
+- Add stronger operator diagnostics for connector health, credential drift, and replay scenarios as usage expands.
+- Add deeper provider, persistence, or evaluation integrations only where the shipped control-plane contracts already prove stable.
+- Expand operator diagnostics and release gating where the current lifecycle already exposes strong evidence paths.
+- Promote important downstream reactions into explicit commands, jobs, or workflow steps instead of relying on implicit coupling.
 
 ## More Docs
 
-See [DEVELOPER.md](./DEVELOPER.md), [TODO.md](./TODO.md), [SECURITY.md](./SECURITY.md), and [CONTRIBUTING.md](./CONTRIBUTING.md).
+See [DEVELOPER.md](./DEVELOPER.md), [TODO.md](./TODO.md), [SECURITY.md](./SECURITY.md), [CONTRIBUTING.md](./CONTRIBUTING.md). The internal domain sources used to build those docs live under:
+
+- `plugins/gutu-plugin-integration-core/framework/builtin-plugins/integration-core/docs/AGENT_CONTEXT.md`
+- `plugins/gutu-plugin-integration-core/framework/builtin-plugins/integration-core/docs/BUSINESS_RULES.md`
+- `plugins/gutu-plugin-integration-core/framework/builtin-plugins/integration-core/docs/EDGE_CASES.md`
+- `plugins/gutu-plugin-integration-core/framework/builtin-plugins/integration-core/docs/FLOWS.md`
+- `plugins/gutu-plugin-integration-core/framework/builtin-plugins/integration-core/docs/GLOSSARY.md`
+- `plugins/gutu-plugin-integration-core/framework/builtin-plugins/integration-core/docs/MANDATORY_STEPS.md`
