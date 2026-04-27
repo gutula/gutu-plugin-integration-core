@@ -31,6 +31,7 @@ import {
 
 import { PageHeader } from "@/admin-primitives/PageHeader";
 import { Card, CardContent } from "@/admin-primitives/Card";
+import { useUiResources } from "@/runtime/useUiMetadata";
 import { Button } from "@/primitives/Button";
 import { Input } from "@/primitives/Input";
 import { Label } from "@/primitives/Label";
@@ -72,7 +73,11 @@ interface ImportResult {
   durationMs: number;
 }
 
-const RESOURCES: Array<{ id: string; label: string; group: string }> = [
+/** Seed list — used as a stable fallback during cold start before the
+ *  live registry has loaded, and to surface a curated subset when the
+ *  registry is empty (e.g. a fresh install with no plugins yet). The
+ *  registry, when populated, takes precedence on conflict. */
+const SEED_RESOURCES: Array<{ id: string; label: string; group: string }> = [
   { id: "crm.contact", label: "Contacts", group: "CRM" },
   { id: "crm.lead", label: "Leads", group: "CRM" },
   { id: "sales.deal", label: "Deals", group: "Sales" },
@@ -116,7 +121,7 @@ async function httpJson<T>(url: string, init: RequestInit): Promise<T> {
 }
 
 export function BulkImportPage(): React.JSX.Element {
-  const [resource, setResource] = React.useState<string>(RESOURCES[0]!.id);
+  const [resource, setResource] = React.useState<string>(SEED_RESOURCES[0]!.id);
   const [step, setStep] = React.useState<"upload" | "map" | "verify">("upload");
   const [parsing, setParsing] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -322,16 +327,33 @@ function ResourcePicker({
   active: string;
   onPick: (id: string) => void;
 }) {
+  const { data: uiResources } = useUiResources();
+  // Live registry first; fall back to the curated SEED_RESOURCES so a
+  // freshly-booted install (no plugins discovered yet) still shows a
+  // sensible starting set. Only writable resources can be imported
+  // into — read-only views have no insert path.
+  type Row = { id: string; label: string; group: string };
+  const merged: Row[] = React.useMemo(() => {
+    const fromRegistry: Row[] = uiResources
+      .filter((r) => (r.actions ?? []).includes("write"))
+      .map((r) => ({ id: r.id, label: r.label ?? r.id, group: r.group ?? "Other" }));
+    if (fromRegistry.length === 0) return [...SEED_RESOURCES];
+    const seen = new Set(fromRegistry.map((r) => r.id));
+    const fallback = SEED_RESOURCES.filter((r) => !seen.has(r.id));
+    return [...fromRegistry, ...fallback].sort((a, b) =>
+      (a.group + a.label).localeCompare(b.group + b.label),
+    );
+  }, [uiResources]);
   const [search, setSearch] = React.useState("");
   const filtered = React.useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return RESOURCES;
-    return RESOURCES.filter((r) => r.id.includes(q) || r.label.toLowerCase().includes(q));
-  }, [search]);
-  const byGroup = new Map<string, typeof RESOURCES>();
+    if (!q) return merged;
+    return merged.filter((r) => r.id.includes(q) || r.label.toLowerCase().includes(q));
+  }, [merged, search]);
+  const byGroup = new Map<string, Row[]>();
   for (const r of filtered) {
-    const list = (byGroup.get(r.group) ?? []) as typeof RESOURCES;
-    byGroup.set(r.group, [...list, r] as typeof RESOURCES);
+    const list = byGroup.get(r.group) ?? [];
+    byGroup.set(r.group, [...list, r]);
   }
   return (
     <Card>
