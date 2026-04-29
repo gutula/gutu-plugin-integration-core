@@ -14,6 +14,10 @@ export const hostPlugin: HostPlugin = {
   routes: [
     { mountPath: "/bulk-import", router: bulkImportRoutes }
   ],
+  resources: [
+    "integration.connection",
+    "integration.ping",
+  ],
 };
 
 // Re-export the lib API so other plugins can `import` from
